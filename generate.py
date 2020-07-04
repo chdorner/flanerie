@@ -4,7 +4,7 @@ import flanerie
 
 @click.command()
 @click.option('--start', nargs=2, type=float, required=True, help='Starting point as GPS coordinate, first latitude, then longitude.')
-@click.option('--bbox-distance', default=5000, type=int, help='Distance of bounding box in meters from starting point.')
+@click.option('--bbox-distance', default=1500, type=int, help='Distance of bounding box in meters from starting point.')
 @click.option('--min-walk-distance', type=int, required=True, help='Minimum distance of generated walk in meters.')
 def generate(start, bbox_distance, min_walk_distance):
     """
