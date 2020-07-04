@@ -25,3 +25,8 @@ Options:
 
   --help                       Show this message and exit.
 ```
+
+## Example routes
+
+![A walk starting from the Nerima ward in Tokyo, Japan](resources/readme-walk-1.png)
+A walk starting from the Nerima ward in Tokyo, Japan. See exact starting point on [OpenStreetMaps](https://www.openstreetmap.org/#map=19/35.72411/139.59118).
