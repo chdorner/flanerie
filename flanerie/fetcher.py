@@ -4,10 +4,10 @@ import hashlib
 import os
 
 import osmnx as ox
+import pandas
 
-class GraphFetcher(object):
+class NetworkFetcher(object):
     VALID_NETWORK_TYPES = ['walk', 'drive']
-    CACHE_PREFIX = 'graphs'
     CACHE_TTL = timedelta(weeks=1)
 
     def __init__(self, type_, start_point, distance, cache_dir):
@@ -29,41 +29,60 @@ class GraphFetcher(object):
 
         raw_cache_key = f'{start_point[0]},{start_point[1]};{distance};{type_}'
         cache_key = hashlib.sha256(raw_cache_key.encode('utf-8')).hexdigest()
-        self._cache_dir = Path(cache_dir).joinpath(self.CACHE_PREFIX)
+        self._cache_dir = Path(cache_dir)
 
-        self._cache_path = self._cache_dir.joinpath(f'{cache_key}.graphml')
-        self._ensure_cache_dir_exists()
+        self._graph_cache_path = self._cache_dir.joinpath('graphs').joinpath(f'{cache_key}.graphml')
+        self._footprint_cache_path = self._cache_dir.joinpath('gdfs').joinpath(f'{cache_key}.pkl')
 
-    def get(self):
-        self._graph = self._fetch_from_cache()
+    def graph(self):
+        self._graph = self._fetch_from_cache('graph', self._graph_cache_path)
         if self._graph is None:
-            self._graph = self._fetch_from_remote()
+            self._graph = self._fetch_from_remote('graph', self._graph_cache_path)
         return self._graph
+
+    def footprint(self):
+        self._footprint = self._fetch_from_cache('footprint', self._footprint_cache_path)
+        if self._footprint is None:
+            self._footprint = self._fetch_from_remote('footprint', self._footprint_cache_path)
+        return self._footprint
 
     def start_node(self):
         if self._graph is None:
-            self.get()
+            self.graph()
         return ox.get_nearest_node(self._graph, self._start_point)
 
-    def _fetch_from_cache(self):
-        if not self._cache_path.exists():
+    def _fetch_from_cache(self, type_, cache_path):
+        if not cache_path.exists():
             return None
 
-        mod_time = self._cache_path.stat().st_mtime
+        mod_time = cache_path.stat().st_mtime
         now = datetime.now().timestamp()
         if (mod_time + self.CACHE_TTL.total_seconds()) < now:
-            os.remove(self._cache_path)
+            os.remove(cache_path)
             return None
 
-        return ox.load_graphml(self._cache_path)
+        if type_ == 'graph':
+            return ox.load_graphml(cache_path)
+        elif type_ == 'footprint':
+            return pandas.read_pickle(cache_path)
 
-    def _fetch_from_remote(self):
-        graph = ox.graph_from_point(self._start_point, self._distance, network_type=self._type)
-        self._store_cache (graph)
-        return graph
+    def _fetch_from_remote(self, type_, cache_path):
+        if type_ == 'graph':
+            graph = ox.graph_from_point(self._start_point, self._distance, network_type=self._type)
+            self._store_graph_cache(graph, cache_path)
+            return graph
+        elif type_ == 'footprint':
+            gdf = ox.footprints_from_point(self._start_point, self._distance)
+            self._store_footprint_cache(gdf, cache_path)
+            return gdf
 
-    def _store_cache(self, graph):
-        ox.save_graphml(graph, self._cache_path)
+    def _store_graph_cache(self, graph, cache_path):
+        self._ensure_dir_exists(cache_path.parent)
+        ox.save_graphml(graph, cache_path)
 
-    def _ensure_cache_dir_exists(self):
-        self._cache_dir.mkdir(parents=True, exist_ok=True)
+    def _store_footprint_cache(self, gdf, cache_path):
+        self._ensure_dir_exists(cache_path.parent)
+        gdf.to_pickle(cache_path)
+
+    def _ensure_dir_exists(self, path):
+        path.mkdir(parents=True, exist_ok=True)

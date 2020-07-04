@@ -2,3 +2,4 @@ click
 matplotlib
 networkx
 osmnx
+pandas
