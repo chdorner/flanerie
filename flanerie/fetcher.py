@@ -15,7 +15,7 @@ class GraphFetcher(object):
         Initialize graph fetcher with starting point and distance of bbox from starting point.
 
         Args:
-            type_ (str): The type of graph to fetch (valid values are `walk`, `drive`, or `buildings`)
+            type_ (str): The type of graph to fetch (valid values are `walk`, `drive`)
             start_point (float, float): The center point from where to start the walk.
             distance (int): Bounding box distance from center to edges.
             cache_dir (str): Path to directory to use for caching graphs.
