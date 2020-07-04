@@ -1,6 +1,7 @@
 import random
 import string
 
+import mong
 import osmnx as ox
 
 from .fetcher import NetworkFetcher
@@ -27,5 +28,5 @@ def generate(start, bbox_distance, min_walk_distance):
     print(f'Rendered assets to {render_path}')
 
 def _random_walk_id():
-    random_id = ''.join(random.choice(string.ascii_lowercase) for _ in range(8))
-    return f'walk-{random_id}'
+    random_name = mong.get_random_name().replace('_', '-')
+    return f'Walk-{random_name}'
