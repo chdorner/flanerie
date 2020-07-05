@@ -7,7 +7,7 @@ import osmnx as ox
 
 from .fetcher import NetworkFetcher
 from .path_finder import RandomPathFinder
-from .rendering import Plotter
+from .rendering import GPXRenderer, Plotter
 
 CACHE_DIR = '.cache'
 RENDER_DIR = 'rendered'
@@ -25,10 +25,14 @@ def generate(start_point, bbox_distance, min_walk_distance):
 
     footprint = fetcher.footprint()
 
+    gpx_renderer = GPXRenderer(walk_id, RENDER_DIR)
+    gpx_renderer.render_route(graph, path)
+
     plotter = Plotter(walk_id, RENDER_DIR)
     plotter.plot_map(start_point, bbox_distance, type_, footprint)
     plotter.plot_route(graph, path)
     render_path = plotter.close()
+
     print(f'Rendered assets to {render_path}')
 
 def _random_walk_id():

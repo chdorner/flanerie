@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from gpxpy import gpx as gpxpy
 import matplotlib.pyplot as plt
 import osmnx as ox
 
@@ -13,7 +14,7 @@ class Plotter(object):
         self._walk_id = walk_id
 
         self._render_dir = Path(render_dir).joinpath(walk_id)
-        self._ensure_render_dir_exists()
+        _ensure_dir_exists(self._render_dir)
 
     def plot_map(self, start_point, distance, type_, footprint=None):
         _, self._ax = ox.plot_figure_ground(point=start_point,
@@ -42,5 +43,30 @@ class Plotter(object):
 
         return self._render_dir
 
-    def _ensure_render_dir_exists(self):
-        self._render_dir.mkdir(parents=True, exist_ok=True)
+
+class GPXRenderer(object):
+    def __init__(self, walk_id, render_dir):
+        self._walk_id = walk_id
+
+        self._render_dir = Path(render_dir).joinpath(walk_id)
+        _ensure_dir_exists(self._render_dir)
+
+    def render_route(self, graph, route):
+        gpx = gpxpy.GPX()
+        gpx.name = self._walk_id
+
+        nodes = graph.nodes()
+        gpx_route = gpxpy.GPXRoute()
+        for node_id in route:
+            node = nodes[node_id]
+            route_point = gpxpy.GPXRoutePoint(latitude=node['y'], longitude=node['x'])
+            gpx_route.points.append(route_point)
+
+        gpx.routes.append(gpx_route)
+
+        with open(self._render_dir.joinpath(f'{self._walk_id}.gpx'), 'w') as fp:
+            fp.write(gpx.to_xml())
+
+
+def _ensure_dir_exists(path):
+    path.mkdir(parents=True, exist_ok=True)
