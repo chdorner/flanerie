@@ -75,7 +75,7 @@ class WeightedRandomPathFinder(object):
 
     def _calculate_edge_weight(self, edge, max_length):
         # Normalized length weight, falls between 0.5 and 1.0
-        normalized_length = ((float(edge['length']) / max_length) / 2) + 0.5
+        normalized_length = ((float(edge['length']) / max_length) / 4) + 0.75
         # Edge type weight
         edge_type = self._edge_type_weight(edge['edge'])
         # Randomize weight
