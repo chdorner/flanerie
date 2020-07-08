@@ -24,23 +24,37 @@ class WeightedRandomPathFinder(object):
 
             # Check if we found a dead-end, if so allow to backtrack.
             if not destinations:
-                # If more than one successor, prevent the path from going back where
-                # it came from.
-                if len(successors) > 1:
-                    destinations = [s for s in successors if s != path[-1]]
-                else:
-                    destinations = successors
+                way_out, distance = self._find_way_out_of_dead_end(current_node, path)
 
-            edges = self._calculate_edges(current_node, destinations)
-            selected_edge = max(edges, key=lambda x: x['weight'])
+                path.extend(way_out)
+                total_distance += distance
+                current_node = way_out[-1]
+            else:
+                edges = self._calculate_edges(current_node, destinations)
+                selected_edge = max(edges, key=lambda x: x['weight'])
 
-            next_node = selected_edge['dest']
-            total_distance += selected_edge['length']
+                next_node = selected_edge['dest']
+                total_distance += selected_edge['length']
 
-            path.append(next_node)
-            current_node = next_node
+                path.append(next_node)
+                current_node = next_node
 
         return path, total_distance
+
+    def _find_way_out_of_dead_end(self, current_node, traversed_path):
+        all_paths = nx.single_source_shortest_path(self._graph, current_node)
+        not_visited = {k: v for k, v in all_paths.items() if k not in traversed_path}
+        closest = min(not_visited, key=lambda x: len(not_visited[x]))
+
+        path = all_paths[closest]
+        distance = 0
+        for idx, node in enumerate(path):
+            # Check if there's still a next node.
+            if (idx + 1) <= len(path) - 1:
+                next_node = path[idx + 1]
+                distance += self._graph[node][next_node][0]['length']
+
+        return path[1:], distance
 
     def _calculate_edges(self, origin, destinations):
         edges = [{'origin': origin,
