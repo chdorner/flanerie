@@ -16,7 +16,7 @@ class Plotter(object):
         self._render_dir = Path(render_dir).joinpath(walk_id)
         _ensure_dir_exists(self._render_dir)
 
-    def plot_map(self, start_point, distance, type_, footprint=None):
+    def plot_map(self, start_point, distance, type_, footprint=None, additional_graphs=None):
         _, self._ax = ox.plot_figure_ground(point=start_point,
                                 dist=distance,
                                 network_type=type_,
@@ -28,6 +28,10 @@ class Plotter(object):
 
         if footprint is not None:
             footprint.plot(ax=self._ax, color=self.COLOR_FOOTPRINT, alpha=0.75)
+
+        if additional_graphs:
+            for additional_graph in additional_graphs:
+                ox.plot_graph(additional_graph, ax=self._ax, show=False, close=False)
 
     def plot_route(self, graph, route):
         if self._ax is None:

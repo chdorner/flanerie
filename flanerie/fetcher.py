@@ -33,6 +33,7 @@ class NetworkFetcher(object):
 
         self._graph_cache_path = self._cache_dir.joinpath('graphs').joinpath(f'{cache_key}.graphml')
         self._footprint_cache_path = self._cache_dir.joinpath('gdfs').joinpath(f'{cache_key}.pkl')
+        self._railway_graph_cache_path = self._cache_dir.joinpath('railway').joinpath(f'{cache_key}.graphml')
 
     def graph(self):
         self._graph = self._fetch_from_cache('graph', self._graph_cache_path)
@@ -45,6 +46,12 @@ class NetworkFetcher(object):
         if self._footprint is None:
             self._footprint = self._fetch_from_remote('footprint', self._footprint_cache_path)
         return self._footprint
+
+    def railway_graph(self):
+        self._railway_graph = self._fetch_from_cache('graph', self._railway_graph_cache_path)
+        if self._railway_graph is None:
+            self._railway_graph = self._fetch_from_remote('railway', self._railway_graph_cache_path)
+        return self._railway_graph
 
     def center_node(self):
         if self._graph is None:
@@ -69,6 +76,10 @@ class NetworkFetcher(object):
     def _fetch_from_remote(self, type_, cache_path):
         if type_ == 'graph':
             graph = ox.graph_from_point(self._center, self._distance, network_type=self._type)
+            self._store_graph_cache(graph, cache_path)
+            return graph
+        elif type_ == 'railway':
+            graph = ox.graph_from_point(self._center, self._distance, custom_filter='["railway"~"tram|rail"]')
             self._store_graph_cache(graph, cache_path)
             return graph
         elif type_ == 'footprint':
