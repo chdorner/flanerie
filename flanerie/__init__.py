@@ -6,7 +6,7 @@ import mong
 import osmnx as ox
 
 from .fetcher import NetworkFetcher
-from .path_finder import RandomPathFinder
+from .path_finder import WeightedRandomPathFinder
 from .rendering import GPXRenderer, Plotter
 
 CACHE_DIR = '.cache'
@@ -21,7 +21,7 @@ def generate(start_point, bbox_distance, min_walk_distance):
     fetcher = NetworkFetcher(type_, start_point, bbox_distance, CACHE_DIR)
     graph = fetcher.graph()
     start_node = fetcher.start_node()
-    path, _ = RandomPathFinder(graph, min_walk_distance, start_node).find()
+    path, _ = WeightedRandomPathFinder(graph, min_walk_distance, start_node).find()
 
     footprint = fetcher.footprint()
 
