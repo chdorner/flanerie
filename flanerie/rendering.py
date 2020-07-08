@@ -45,15 +45,16 @@ class Plotter(object):
 
 
 class GPXRenderer(object):
-    def __init__(self, walk_id, render_dir):
-        self._walk_id = walk_id
+    def __init__(self, walk_name, walk_slug, render_dir):
+        self._walk_name = walk_name
+        self._walk_slug = walk_slug
 
-        self._render_dir = Path(render_dir).joinpath(walk_id)
+        self._render_dir = Path(render_dir).joinpath(walk_slug)
         _ensure_dir_exists(self._render_dir)
 
     def render_route(self, graph, route):
         gpx = gpxpy.GPX()
-        gpx.name = self._walk_id
+        gpx.name = self._walk_name
 
         nodes = graph.nodes()
         gpx_route = gpxpy.GPXRoute()
@@ -64,7 +65,7 @@ class GPXRenderer(object):
 
         gpx.routes.append(gpx_route)
 
-        with open(self._render_dir.joinpath(f'{self._walk_id}.gpx'), 'w') as fp:
+        with open(self._render_dir.joinpath(f'{self._walk_slug}.gpx'), 'w') as fp:
             fp.write(gpx.to_xml())
 
 

@@ -2,7 +2,6 @@ click
 gpxpy
 jupyterlab
 matplotlib
-mong
 networkx
 osmnx
 pandas
