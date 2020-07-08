@@ -13,7 +13,7 @@ centers[4]="51.0562,4.7480"
 # Japan, Tokyo, Otsuka
 centers[5]="35.7331,139.7295"
 # Japan, Shikoku, Oboke
-centers[6]="33.8769,133,7674"
+centers[6]="33.8769,133.7674"
 # Japan, Niigata
 centers[7]="37.9309,139.0520"
 # USA, New York, Lower East Side
