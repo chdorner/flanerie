@@ -11,10 +11,10 @@ Usage: generate.py [OPTIONS]
   Generate random amble walks based off of a starting point and a minimum
   target distance.
 
-  e.g. python3 generate.py --start 52.46794 13.31386 --min-distance 5000
+  e.g. python3 generate.py --center 52.46794 13.31386 --min-walk-distance 5000
 
 Options:
-  --start FLOAT...             Starting point as GPS coordinate, first
+  --center FLOAT...            Starting point as GPS coordinate, first
                                latitude, then longitude.  [required]
 
   --bbox-distance INTEGER      Distance of bounding box in meters from
@@ -22,6 +22,9 @@ Options:
 
   --min-walk-distance INTEGER  Minimum distance of generated walk in meters.
                                [required]
+
+  --random-start               Select random location to start walk, if false
+                               then it uses center as start.
 
   --help                       Show this message and exit.
 ```

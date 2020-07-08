@@ -15,13 +15,16 @@ RENDER_DIR = 'rendered'
 
 ox.config(use_cache=True, cache_folder=Path(CACHE_DIR).joinpath('osmnx'), log_console=False)
 
-def generate(start_point, bbox_distance, min_walk_distance):
+def generate(center, bbox_distance, min_walk_distance, random_start):
     walk_name, walk_slug = _random_name_and_slug()
     type_ = 'walk'
 
-    fetcher = NetworkFetcher(type_, start_point, bbox_distance, CACHE_DIR)
+    fetcher = NetworkFetcher(type_, center, bbox_distance, CACHE_DIR)
     graph = fetcher.graph()
-    start_node = fetcher.start_node()
+
+    start_node = None
+    if not random_start:
+        start_node = fetcher.center_node()
     path, _ = WeightedRandomPathFinder(graph, min_walk_distance, start_node).find()
 
     footprint = fetcher.footprint()
@@ -30,7 +33,7 @@ def generate(start_point, bbox_distance, min_walk_distance):
     gpx_renderer.render_route(graph, path)
 
     plotter = Plotter(walk_slug, RENDER_DIR)
-    plotter.plot_map(start_point, bbox_distance, type_, footprint)
+    plotter.plot_map(center, bbox_distance, type_, footprint)
     plotter.plot_route(graph, path)
     render_path = plotter.close()
 

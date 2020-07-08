@@ -10,13 +10,13 @@ class NetworkFetcher(object):
     VALID_NETWORK_TYPES = ['walk', 'drive']
     CACHE_TTL = timedelta(weeks=1)
 
-    def __init__(self, type_, start_point, distance, cache_dir):
+    def __init__(self, type_, center, distance, cache_dir):
         """
-        Initialize graph fetcher with starting point and distance of bbox from starting point.
+        Initialize graph fetcher with cetner point and distance of bbox from that point.
 
         Args:
             type_ (str): The type of graph to fetch (valid values are `walk`, `drive`)
-            start_point (float, float): The center point from where to start the walk.
+            center (float, float): The center point of the map.
             distance (int): Bounding box distance from center to edges.
             cache_dir (str): Path to directory to use for caching graphs.
 
@@ -24,10 +24,10 @@ class NetworkFetcher(object):
             GraphFetcher instance
         """
         self._type = type_
-        self._start_point = start_point
+        self._center = center
         self._distance = distance
 
-        raw_cache_key = f'{start_point[0]},{start_point[1]};{distance};{type_}'
+        raw_cache_key = f'{center[0]},{center[1]};{distance};{type_}'
         cache_key = hashlib.sha256(raw_cache_key.encode('utf-8')).hexdigest()
         self._cache_dir = Path(cache_dir)
 
@@ -46,10 +46,10 @@ class NetworkFetcher(object):
             self._footprint = self._fetch_from_remote('footprint', self._footprint_cache_path)
         return self._footprint
 
-    def start_node(self):
+    def center_node(self):
         if self._graph is None:
             self.graph()
-        return ox.get_nearest_node(self._graph, self._start_point)
+        return ox.get_nearest_node(self._graph, self._center)
 
     def _fetch_from_cache(self, type_, cache_path):
         if not cache_path.exists():
@@ -68,11 +68,11 @@ class NetworkFetcher(object):
 
     def _fetch_from_remote(self, type_, cache_path):
         if type_ == 'graph':
-            graph = ox.graph_from_point(self._start_point, self._distance, network_type=self._type)
+            graph = ox.graph_from_point(self._center, self._distance, network_type=self._type)
             self._store_graph_cache(graph, cache_path)
             return graph
         elif type_ == 'footprint':
-            gdf = ox.footprints_from_point(self._start_point, self._distance)
+            gdf = ox.footprints_from_point(self._center, self._distance)
             self._store_footprint_cache(gdf, cache_path)
             return gdf
 

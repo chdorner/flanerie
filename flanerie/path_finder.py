@@ -3,12 +3,15 @@ import random
 import networkx as nx
 
 class WeightedRandomPathFinder(object):
-    def __init__(self, graph, min_path_distance, start_node):
+    def __init__(self, graph, min_path_distance, start_node=None):
         self._graph = graph
         self._min_path_distance = min_path_distance
-        self._start_node = start_node
 
         self._nodes = list(graph.nodes())
+
+        if start_node is None:
+            start_node = random.choice(self._nodes)
+        self._start_node = start_node
 
     def find(self):
         total_distance = 0
