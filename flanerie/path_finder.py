@@ -1,3 +1,4 @@
+import math
 import random
 
 import networkx as nx
@@ -44,7 +45,10 @@ class WeightedRandomPathFinder(object):
     def _find_way_out_of_dead_end(self, current_node, traversed_path):
         all_paths = nx.single_source_shortest_path(self._graph, current_node)
         not_visited = {k: v for k, v in all_paths.items() if k not in traversed_path}
-        closest = min(not_visited, key=lambda x: len(not_visited[x]))
+        not_visited_nodes = sorted(not_visited.keys(), key=lambda x: len(not_visited[x]))
+
+        closest_one_percent = not_visited_nodes[0:math.ceil(len(not_visited_nodes)*0.01)]
+        closest = random.choice(closest_one_percent)
 
         path = all_paths[closest]
         distance = 0
