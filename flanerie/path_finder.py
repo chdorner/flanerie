@@ -24,7 +24,12 @@ class WeightedRandomPathFinder(object):
 
             # Check if we found a dead-end, if so allow to backtrack.
             if not destinations:
-                destinations = successors
+                # If more than one successor, prevent the path from going back where
+                # it came from.
+                if len(successors) > 1:
+                    destinations = [s for s in successors if s != path[-1]]
+                else:
+                    destinations = successors
 
             edges = self._calculate_edges(current_node, destinations)
             selected_edge = max(edges, key=lambda x: x['weight'])
