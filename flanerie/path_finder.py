@@ -84,6 +84,7 @@ class WeightedRandomPathFinder(object):
             'primary': DISCOURAGED,
             # avoid
             'trunk': AVOID,
+            'trunk_link': AVOID,
             'motorway': AVOID,
             'unclassified': AVOID,
         }
