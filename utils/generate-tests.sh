@@ -22,8 +22,10 @@ centers[8]="40.7207,-73.9880"
 centers[9]="4.6375,-74.0768"
 
 for item in ${centers[*]}; do
-    python3 ./generate.py --center $item --bbox-distance 1500 --min-walk-distance 5000
-    for run in {1..3}; do
+    for run in {1..2}; do
+        python3 ./generate.py --center $item --bbox-distance 1500 --min-walk-distance 5000
+    done
+    for run in {1..2}; do
         python3 ./generate.py --center $item --bbox-distance 1500 --min-walk-distance 5000 --random-start
     done
 done
