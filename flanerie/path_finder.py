@@ -69,6 +69,7 @@ class WeightedRandomPathFinder(object):
             'track': PREFERRED,
             'corridor': PREFERRED,
             'footway': PREFERRED,
+            'pedestrian': PREFERRED,
             'steps': PREFERRED,
             'living_street': PREFERRED,
             'service': PREFERRED,
