@@ -50,9 +50,47 @@ class WeightedRandomPathFinder(object):
     def _calculate_edge_weight(self, edge, max_length):
         # Normalized length weight, falls between 0.5 and 1.0
         normalized_length = ((float(edge['length']) / max_length) / 2) + 0.5
+        # Edge type weight
+        edge_type = self._edge_type_weight(edge['edge'])
         # Randomize weight
         randomizer = random.choice(range(66, 100)) / 100
 
-        weight = normalized_length * randomizer
+        weight = normalized_length * edge_type * randomizer
+        return weight
+
+    def _edge_type_weight(self, edge):
+        PREFERRED, ACCEPTABLE, DISCOURAGED, AVOID = 1.0, 0.75, 0.25, 0
+        types = {
+            # preferred
+            'path': PREFERRED,
+            'track': PREFERRED,
+            'corridor': PREFERRED,
+            'footway': PREFERRED,
+            'steps': PREFERRED,
+            'living_street': PREFERRED,
+            'service': PREFERRED,
+            'residential': PREFERRED,
+            # acceptable
+            'tertiary_link': ACCEPTABLE,
+            'tertiary': ACCEPTABLE,
+            'secondary_link': ACCEPTABLE,
+            'secondary': ACCEPTABLE,
+            # discouraged
+            'primary_link': DISCOURAGED,
+            'primary': DISCOURAGED,
+            # avoid
+            'trunk': AVOID,
+            'motorway': AVOID,
+            'unclassified': AVOID,
+        }
+
+        type_ = edge['highway']
+        if isinstance(type_, list):
+            type_ = type_[0]
+
+        weight = types.get(type_)
+        if weight is None:
+            print(f'Found unclassified edge type "{type_}"')
+            return AVOID
 
         return weight
