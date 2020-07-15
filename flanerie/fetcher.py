@@ -51,6 +51,9 @@ class NetworkFetcher(object):
             self.graph()
         return ox.get_nearest_node(self._graph, self._center)
 
+    def nearest_node(self, point):
+        return ox.get_nearest_node(self._graph, point)
+
     def _fetch_from_cache(self, type_, cache_path):
         if not cache_path.exists():
             return None
