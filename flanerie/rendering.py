@@ -57,13 +57,17 @@ class GPXRenderer(object):
         gpx.name = self._walk_name
 
         nodes = graph.nodes()
-        gpx_route = gpxpy.GPXRoute()
+        track = gpxpy.GPXTrack()
+        track.name = self._walk_name
+        segment = gpxpy.GPXTrackSegment()
+        track.segments.append(segment)
+
         for node_id in route:
             node = nodes[node_id]
-            route_point = gpxpy.GPXRoutePoint(latitude=node['y'], longitude=node['x'])
-            gpx_route.points.append(route_point)
+            segment_point = gpxpy.GPXTrackPoint(latitude=node['y'], longitude=node['x'])
+            segment.points.append(segment_point)
 
-        gpx.routes.append(gpx_route)
+        gpx.tracks.append(track)
 
         with open(self._render_dir.joinpath(f'{self._walk_slug}.gpx'), 'w') as fp:
             fp.write(gpx.to_xml())
