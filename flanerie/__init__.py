@@ -2,7 +2,6 @@ from pathlib import Path
 import random
 import string
 
-import mong
 import osmnx as ox
 
 from .fetcher import NetworkFetcher
@@ -54,13 +53,23 @@ def regenerate(gpx_input, bbox_distance):
 
     route = [fetcher.nearest_node(p) for p in path]
 
+    import networkx as nx
+    updated_route = [route[0]]
+    for idx, n in enumerate(route):
+        if n == route[-1]:
+            break
+        target = route[idx + 1]
+
+        shortest_path = nx.shortest_path(graph, n, target)
+        updated_route.extend(shortest_path[1:])
+
     gpx_renderer = GPXRenderer(walk_name, walk_slug, RENDER_DIR)
-    gpx_renderer.render_route(graph, route)
+    gpx_renderer.render_route(graph, updated_route)
 
     footprint = fetcher.footprint()
     plotter = Plotter(walk_slug, RENDER_DIR)
     plotter.plot_map(center, bbox_distance, NETWORK_TYPE, footprint)
-    plotter.plot_route(graph, route)
+    plotter.plot_route(graph, updated_route)
     render_path = plotter.close()
 
     print(f'Rendered assets to {render_path}')
