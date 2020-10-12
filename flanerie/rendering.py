@@ -21,7 +21,7 @@ class Plotter(object):
                                 dist=distance,
                                 network_type=type_,
                                 bgcolor=self.COLOR_BACKGROUND,
-                                default_width=2,
+                                default_width=4,
                                 figsize=self.FIGSIZE,
                                 show=False,
                                 close=False)
@@ -34,7 +34,8 @@ class Plotter(object):
             raise Exception('Need to plot the map first before the route.')
 
         ox.plot_graph_route(graph, route, ax=self._ax, route_colors=self.COLOR_ROUTE,
-                             alpha=1, orig_dest_size=250, show=False, close=False)
+                             alpha=1, orig_dest_size=250, route_linewidth=4,
+                             show=False, close=False)
 
     def close(self):
         plt.savefig(self._render_dir.joinpath(f'{self._walk_id}.png'))
